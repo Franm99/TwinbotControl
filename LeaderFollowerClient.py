@@ -20,20 +20,21 @@ class LeaderFollowerClient():
     def __init__(self, root, geometryString, name, r1, r2):
 
         self.root = root
-        self.name = name
         self.r1 = r1
         self.r2 = r2
 
         self.robotWindow = tk.Toplevel(root)
         self.robotWindow.geometry(geometryString)
-        self.label = tk.Label(self.robotWindow, text="Control conjunto")
+        self.robotWindow.title(name)
+
+        self.label = tk.Label(self.robotWindow, text="Group control")
         self.label.grid(row=0, sticky="n", columnspan=3)
 
         self.w = 7
         self.h = 3
 
-        self.posr1 = ["", "", ""]
-        self.posr2 = ["", "", ""]
+        self.pos1 = ["", "", ""]
+        self.pos2 = ["", "", ""]
 
         #### Grid de botones de control ####
         self.robotFw = tk.Button(self.robotWindow, text="\u2B9D", command=self.forward)
@@ -84,22 +85,22 @@ class LeaderFollowerClient():
         #### --------------------------------- ####
 
         #### Tomar posición actual (x, y, z) ####
-        self.buttonGetPos = tk.Button(self.robotWindow, text="Get Position", command=self.getPosition)
-        self.buttonGetPos.grid(row=5, column=0, columnspan=4, rowspan=3, sticky="WENS")
+        self.buttonGetPos = tk.Button(self.robotWindow, text="Get\nPos", command=self.getPosition)
+        self.buttonGetPos.grid(row=5, column=0, columnspan=1, rowspan=4, sticky="WENS")
 
-        self.labelPosXr1 = tk.Label(self.robotWindow, text=self.posr1[0])
-        self.labelPosXr1.grid(row=5, column=1, columnspan=2, sticky="W")
-        self.labelPosYr1 = tk.Label(self.robotWindow, text=self.posr1[1])
-        self.labelPosYr1.grid(row=6, column=1, columnspan=2, sticky="W")
-        self.labelPosZr1 = tk.Label(self.robotWindow, text=self.posr1[2])
-        self.labelPosZr1.grid(row=7, column=1, columnspan=2, sticky="W")
+        self.labelPosXr1 = tk.Label(self.robotWindow, text=self.pos1[0])
+        self.labelPosXr1.grid(row=5, column=1, columnspan=1, sticky="W")
+        self.labelPosYr1 = tk.Label(self.robotWindow, text=self.pos1[1])
+        self.labelPosYr1.grid(row=6, column=1, columnspan=1, sticky="W")
+        self.labelPosZr1 = tk.Label(self.robotWindow, text=self.pos1[2])
+        self.labelPosZr1.grid(row=7, column=1, columnspan=1, sticky="W")
 
-        self.labelPosXr1 = tk.Label(self.robotWindow, text=self.posr2[0])
-        self.labelPosXr1.grid(row=5, column=1, columnspan=2, sticky="W")
-        self.labelPosYr1 = tk.Label(self.robotWindow, text=self.posr2[1])
-        self.labelPosYr1.grid(row=6, column=1, columnspan=2, sticky="W")
-        self.labelPosZr1 = tk.Label(self.robotWindow, text=self.posr2[2])
-        self.labelPosZr1.grid(row=7, column=1, columnspan=2, sticky="W")
+        self.labelPosXr2 = tk.Label(self.robotWindow, text=self.pos2[0])
+        self.labelPosXr2.grid(row=5, column=2, columnspan=1, sticky="W")
+        self.labelPosYr2 = tk.Label(self.robotWindow, text=self.pos2[1])
+        self.labelPosYr2.grid(row=6, column=2, columnspan=1, sticky="W")
+        self.labelPosZr2 = tk.Label(self.robotWindow, text=self.pos2[2])
+        self.labelPosZr2.grid(row=7, column=2, columnspan=1, sticky="W")
         #### ------------------------------- ####
 
     def forward(self):
@@ -143,16 +144,18 @@ class LeaderFollowerClient():
         self.r2.setVelocityPctg(val)
 
     def getPosition(self):
-        self.posr1 = self.r1.getPosition()
-        self.posr2 = self.r2.getPosition()
+        req1 = requests.get(self.r1.url + self.comm["pos"])
+        pos1_json = req1.json()
+        self.labelPosXr1['text'] = "x = " + str(round(pos1_json["x"], 4))
+        self.labelPosYr1['text'] = "y = " + str(round(pos1_json["y"], 4))
+        self.labelPosZr1['text'] = "z = " + str(round(pos1_json["z"], 4))
+        self.pos1 = [pos1_json["x"], pos1_json["y"], pos1_json["z"]]
 
-    # TODO: Arreglar esto
-    def getPosition(self):
-        req = requests.get(self.url + self.comm["pos"])
-        pos_json = req.json()
-        self.labelPosX['text'] = "x = " + str(round(pos_json["x"], 6))
-        self.labelPosY['text'] = "y = " + str(round(pos_json["y"], 6))
-        self.labelPosZ['text'] = "z = " + str(round(pos_json["z"], 6))
+        req2 = requests.get(self.r2.url + self.comm["pos"])
+        pos2_json = req2.json()
+        self.labelPosXr2['text'] = "x = " + str(round(pos2_json["x"], 3))
+        self.labelPosYr2['text'] = "y = " + str(round(pos2_json["y"], 3))
+        self.labelPosZr2['text'] = "z = " + str(round(pos2_json["z"], 3))
+        self.pos2 = [pos2_json["x"], pos2_json["y"], pos2_json["z"]]
 
-        self.pos = (pos_json["x"], pos_json["y"], pos_json["z"])
-        return self.pos
+        return self.pos1, self.pos2
