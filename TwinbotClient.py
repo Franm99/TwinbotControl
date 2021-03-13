@@ -14,7 +14,10 @@ class TwinbotClient():
             "u": '/up',
             "d": '/down',
             "vel": '/setVelocity?',
-            "pos": '/getPosition'
+            "pos": '/getPosition',
+            "open": '/OPEN',
+            "close": '/CLOSE',
+            "stopg": '/STOP'
             }
 
 
@@ -22,10 +25,20 @@ class TwinbotClient():
 
         self.root = root
         self.url = url
+        self.name = name
+
+        self.port = self.url.split(":")[-1]
+        self.gripper_port = ""
+        if self.port == "8000":
+            self.gripper_port = "8002"
+        else:
+            self.gripper_port = "8012"
+
+        self.url_gripper = self.url[:-4] + self.gripper_port
 
         self.robotWindow = tk.Toplevel(root)
         self.robotWindow.geometry(geometryString)
-        self.robotWindow.title(name)
+        self.robotWindow.title(self.name)
 
         self.label = tk.Label(self.robotWindow, text=url)
         self.label.grid(row=0, sticky="n", columnspan=3)
@@ -73,27 +86,44 @@ class TwinbotClient():
         self.robotDown.grid(row=1, column=0, columnspan=1, sticky="WE")
         #### --------------------------- ####
 
+        self.separator = tk.Label(self.robotWindow, text=" ")
+        self.separator.grid(row=0, column=4, rowspan=10)
+
         ####  Slider para control de velocidad ####
         self.sliderVel = tk.Scale(self.robotWindow, from_=0, to=200, sliderlength=10, width=10,
                                   orient=tk.VERTICAL, command=self.setVelocityPctg)
         self.sliderVel.set(0)
-        self.sliderVel.grid(row=1, column=4, columnspan=1, rowspan=3, sticky="NS")
+        self.sliderVel.grid(row=1, column=5, columnspan=1, rowspan=2, sticky="WENS")
 
         self.label2 = tk.Label(self.robotWindow, text="% Z Vel")
-        self.label2.grid(row=0, column=4, sticky="WE", columnspan=1)
+        self.label2.grid(row=0, column=5, sticky="WE", columnspan=1)
         #### --------------------------------- ####
 
         #### Tomar posición actual (x, y, z) ####
-        self.buttonGetPos = tk.Button(self.robotWindow, text="Get\nPos", command=self.getPosition)
-        self.buttonGetPos.grid(row=5, column=0, columnspan=1, rowspan=3, sticky="WENS")
+        txt = "Get Position\n\n" + self.name.split(" ")[0]
+        self.buttonGetPos = tk.Button(self.robotWindow, text=txt, command=self.getPosition)
+        self.buttonGetPos.configure(height=self.h, width=self.w*2)
+        self.buttonGetPos.grid(row=3, column=5, columnspan=2, rowspan=1, sticky="WENS")
 
         self.labelPosX = tk.Label(self.robotWindow, text=self.pos[0])
-        self.labelPosX.grid(row=5, column=1, columnspan=2, sticky="W")
+        self.labelPosX.config(font=('TkDefaultFont', 8))
+        self.labelPosX.grid(row=4, column=5, columnspan=2, sticky="W")
         self.labelPosY = tk.Label(self.robotWindow, text=self.pos[1])
-        self.labelPosY.grid(row=6, column=1, columnspan=2, sticky="W")
+        self.labelPosY.config(font=('TkDefaultFont', 8))
+        self.labelPosY.grid(row=5, column=5, columnspan=2, sticky="W")
         self.labelPosZ = tk.Label(self.robotWindow, text=self.pos[2])
-        self.labelPosZ.grid(row=7, column=1, columnspan=2, sticky="W")
+        self.labelPosZ.config(font=('TkDefaultFont', 8))
+        self.labelPosZ.grid(row=6, column=5, columnspan=2, sticky="W")
         #### ------------------------------- ####
+
+        ### Controlar Gripper ###
+        self.buttonOpenG = tk.Button(self.robotWindow, text="Open\nGripper", command=self.openG)
+        self.buttonOpenG.grid(row=5, column=0, rowspan=2, sticky="NSWE")
+        self.buttonCloseG = tk.Button(self.robotWindow, text="Close\nGripper", command=self.closeG)
+        self.buttonCloseG.grid(row=5, column=1, rowspan=2, sticky="NSWE")
+        self.buttonStopG = tk.Button(self.robotWindow, text="Stop\nGripper", command=self.stopG)
+        self.buttonStopG.grid(row=5, column=2, rowspan=2, sticky="NSWE")
+        ### ----------------- ###
 
     def forward(self):
         r = requests.get(self.url + self.comm["fw"])
@@ -146,6 +176,16 @@ class TwinbotClient():
 
         self.pos = (pos_json["x"], pos_json["y"], pos_json["z"])
         return self.pos
+
+    def openG(self):
+        req = requests.get(self.url_gripper + self.comm["open"])
+
+    def closeG(self):
+        req = requests.get(self.url_gripper + self.comm["close"])
+
+    def stopG(self):
+        req = requests.get(self.url_gripper + self.comm["stopg"])
+
 
 
 

@@ -3,6 +3,11 @@ import tkinter as tk
 from Utils.PIDController import PIDController
 import time
 
+# TODO: Complete interface   - Not the most important
+# TODO: First mission point  - Change PID parameters
+# TODO: Second mission point - Apply Time control to grid
+# - Time to close grip: 6.774 seg
+# TODO: Third mission point  - implement ascent
 class LeaderFollowerMissionClient(Thread):
 
     # Commands
@@ -45,12 +50,12 @@ class LeaderFollowerMissionClient(Thread):
         Pr1 = [10, 10, 10]
         Ir1 = [0 , 0 , 0 ]
         Dr1 = [0 , 0 , 0 ]
-        ref_r1 = [-3.759307, 1.175721, 14.601308]
+        ref_r1 = [-3.2, 1.239, 15]  # TODO: modify (?)
 
         Pr2 = [2, 2, 2]
         Ir2 = [0, 0, 0]
         Dr2 = [0, 0, 0]
-        ref_r2 = [-1.282352, 1.996269, 14.513315]
+        ref_r2 = [-1.733, 1.905, 15.113]  # TODO: modify (?)
 
         self.pid_r1 = PIDController(Pr1, Ir1, Dr1, ref_r1, self.timesleep, self.output_lims)
         self.pid_r2 = PIDController(Pr2, Ir2, Dr2, ref_r2, self.timesleep, self.output_lims)
