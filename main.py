@@ -30,15 +30,18 @@ def execute_version(root, v=1):
 
     # # Ex3: Cameras Feedback & 2 robots teleoperated control with tkinter # #
             if v >= 3:
-                r1 = TwinbotClient(root, "294x260+420+100", "Girona5001 Control", "http://127.0.0.1:8000")
-                r2 = TwinbotClient(root, "294x260+420+400", "Girona5002 Control", "http://127.0.0.1:8010")
+                r1 = TwinbotClient(root, "294x260+420+100", "Girona5001 Control",
+                                   "http://127.0.0.1:8000")
+                r2 = TwinbotClient(root, "294x260+420+400", "Girona5002 Control",
+                                   "http://127.0.0.1:8010")  # Leader
 
     # # Ex4: Cameras Feedback & 2 robot user-synchronized control with Tkinter # #
                 if v >= 4:
                     lf = LeaderFollowerClient(root, "294x260+722+100", "LF Manual", r1, r2)
+                    lf.start()
 
                     if v >= 5:
-                        lfm = LeaderFollowerMissionClient(root, "294x260+722+400", "LeaderFollower", r1, r2)
+                        lfm = LeaderFollowerMissionClient(root, "294x260+722+400", "LF Mission", r1, r2)
                         lfm.start()
 
     print(f"TWINBOT Control Interface (v.{v})")

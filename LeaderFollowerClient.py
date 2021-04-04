@@ -1,8 +1,9 @@
 import tkinter as tk
 import requests
 import time
+from threading import Thread
 
-class LeaderFollowerClient():
+class LeaderFollowerClient(Thread):
 
     # Commands
     comm = {"fw": '/forward',
@@ -22,6 +23,7 @@ class LeaderFollowerClient():
             }
 
     def __init__(self, root, geometryString, name, r1, r2):
+        Thread.__init__(self)
 
         self.root = root
         self.r1 = r1
@@ -42,6 +44,8 @@ class LeaderFollowerClient():
 
         self.ts = 0
         self.te = 0
+        self.tsum = 0
+        self.closing = False
 
         #### Grid de botones de control ####
         self.robotDown = tk.Button(self.robotWindow, text="\u2304", command=self.down)
@@ -107,27 +111,6 @@ class LeaderFollowerClient():
         self.labelPosr2 = tk.Label(self.robotWindow, text="")
         self.labelPosr2.config(font=('TkDefaultFont', 8))
         self.labelPosr2.grid(row=4, column=5, columnspan=2, sticky="W")
-
-        # self.labelPosXr1 = tk.Label(self.robotWindow, text=self.pos1[0])
-        # self.labelPosXr1.config(font=('TkDefaultFont', 8))
-        # self.labelPosXr1.grid(row=3, column=5, columnspan=1, sticky="W")
-        # self.labelPosYr1 = tk.Label(self.robotWindow, text=self.pos1[1])
-        # self.labelPosYr1.config(font=('TkDefaultFont', 8))
-        # self.labelPosYr1.grid(row=4, column=5, columnspan=1, sticky="W")
-        # self.labelPosZr1 = tk.Label(self.robotWindow, text=self.pos1[2])
-        # self.labelPosZr1.config(font=('TkDefaultFont', 8))
-        # self.labelPosZr1.grid(row=5, column=5, columnspan=1, sticky="W")
-        #
-        # self.labelPosXr2 = tk.Label(self.robotWindow, text=self.pos2[0])
-        # self.labelPosXr2.config(font=('TkDefaultFont', 8))
-        # self.labelPosXr2.grid(row=3, column=6, columnspan=1, sticky="W")
-        # self.labelPosYr2 = tk.Label(self.robotWindow, text=self.pos2[1])
-        # self.labelPosYr2.config(font=('TkDefaultFont', 8))
-        # self.labelPosYr2.grid(row=4, column=6, columnspan=1, sticky="W")
-        # self.labelPosZr2 = tk.Label(self.robotWindow, text=self.pos2[2])
-        # self.labelPosZr2.config(font=('TkDefaultFont', 8))
-        # self.labelPosZr2.grid(row=5, column=6, columnspan=1, sticky="W")
-        #### ------------------------------- ####
 
         self.separatorH = tk.Label(self.robotWindow, text=" ")
         self.separatorH.grid(row=6, column=0, columnspan=10)
@@ -215,14 +198,26 @@ class LeaderFollowerClient():
     def openG(self):
         self.r1.openG()
         self.r2.openG()
+        self.te = 0
+        self.tsum = 0
+        self.TimeGripper['text'] = str(round(self.te, 3))
 
     def closeG(self):
         self.r1.closeG()
         self.r2.closeG()
         self.ts = time.time()
+        self.closing = True
 
     def stopG(self):
         self.r1.stopG()
         self.r2.stopG()
-        self.te = time.time() - self.ts
-        self.TimeGripper['text'] = str(round(self.te, 3))
+        self.tsum = self.te
+        self.closing = False
+
+    def run(self):
+        while (True):
+            if self.closing:
+                self.te = self.tsum + (time.time() - self.ts)
+                self.TimeGripper['text'] = str(round(self.te, 3))
+            time.sleep(0.1)
+

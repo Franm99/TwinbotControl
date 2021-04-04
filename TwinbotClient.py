@@ -185,13 +185,3 @@ class TwinbotClient():
 
     def stopG(self):
         req = requests.get(self.url_gripper + self.comm["stopg"])
-
-
-
-
-
-
-
-
-
-
