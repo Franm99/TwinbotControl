@@ -2,6 +2,7 @@ import tkinter as tk
 import requests
 import time
 from threading import Thread
+from threading import Lock
 
 class LeaderFollowerClient(Thread):
 
@@ -21,6 +22,8 @@ class LeaderFollowerClient(Thread):
             "close": '/CLOSE',
             "stopg": '/STOP'
             }
+
+    lock = Lock()
 
     def __init__(self, root, geometryString, name, r1, r2):
         Thread.__init__(self)
@@ -171,7 +174,9 @@ class LeaderFollowerClient(Thread):
         self.r2.setVelocityPctg(val)
 
     def getPosition(self):
+        LeaderFollowerClient.lock.acquire()
         req1 = requests.get(self.r1.url + self.comm["pos"])
+        LeaderFollowerClient.lock.release()
         pos1_json = req1.json()
         x1 = str(round(pos1_json["x"], 3))
         y1 = str(round(pos1_json["y"], 3))

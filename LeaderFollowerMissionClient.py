@@ -3,13 +3,8 @@ import tkinter as tk
 from Utils.PIDController import PIDController
 import time
 
-# TODO: Complete interface   - Not the most important
-# TODO: First mission point  - Change PID parameters
-# TODO: Second mission point - Apply Time control to grid
-# - Time to close grip: 6.774 seg
-# TODO: Third mission point  - implement ascent
-class LeaderFollowerMissionClient(Thread):
 
+class LeaderFollowerMissionClient(Thread):
     # Commands
     comm = {"fw": '/forward',
             "bw": '/backward',
@@ -39,32 +34,32 @@ class LeaderFollowerMissionClient(Thread):
 
         # Gui
         self.startButton = tk.Button(self.LFWindow, text="Start", command=self.startControlFunc,
-                                     width=15)
+                                     width=5)
         self.startButton.grid(row=1, column=1, sticky="WE")
         self.stopButton = tk.Button(self.LFWindow, text="Stop", command=self.stopControlFunc,
-                                    width=15)
+                                    width=5)
         self.stopButton.grid(row=1, column=2, sticky="WE")
 
         self.sep1 = tk.Label(self.LFWindow, text="", width=4)
         self.sep1.grid(row=0, rowspan=6, column=0)
-        self.lbl = tk.Label(self.LFWindow, text="STAGE", width=15, pady=8, relief="solid", padx=3, fg="blue")
+        self.lbl = tk.Label(self.LFWindow, text="STAGE", width=7, pady=8, relief="solid", padx=3, fg="blue")
         self.lbl.grid(row=3, column=1)
-        self.lbl = tk.Label(self.LFWindow, text="STATE", width=15, pady=8, relief="solid", padx=3, fg="blue")
+        self.lbl = tk.Label(self.LFWindow, text="STATE", width=7, pady=8, relief="solid", padx=3, fg="blue")
         self.lbl.grid(row=3, column=2)
         self.sep1 = tk.Label(self.LFWindow, text="", width=5)
         self.sep1.grid(row=2, rowspan=1, column=0, columnspan=2)
-        self.lbl = tk.Label(self.LFWindow, text="Inmersing", width=15, pady=8, relief="solid", padx=3)
+        self.lbl = tk.Label(self.LFWindow, text="Inmersing", width=7, pady=8, relief="solid", padx=3)
         self.lbl.grid(row=4, column=1)
-        self.lbl = tk.Label(self.LFWindow, text="Grasping", width=15, pady=8, relief="solid", padx=3)
+        self.lbl = tk.Label(self.LFWindow, text="Grasping", width=7, pady=8, relief="solid", padx=3)
         self.lbl.grid(row=5, column=1)
-        self.lbl = tk.Label(self.LFWindow, text="Emerging", width=15, pady=8, relief="solid", padx=3)
+        self.lbl = tk.Label(self.LFWindow, text="Emerging", width=7, pady=8, relief="solid", padx=3)
         self.lbl.grid(row=6, column=1)
 
-        self.lbl1 = tk.Label(self.LFWindow, text="", width=15, pady=8, relief="solid", padx=3)
+        self.lbl1 = tk.Label(self.LFWindow, text="", width=7, pady=8, relief="solid", padx=3)
         self.lbl1.grid(row=4, column=2)
-        self.lbl2 = tk.Label(self.LFWindow, text="", width=15, pady=8, relief="solid", padx=3)
+        self.lbl2 = tk.Label(self.LFWindow, text="", width=7, pady=8, relief="solid", padx=3)
         self.lbl2.grid(row=5, column=2)
-        self.lbl3 = tk.Label(self.LFWindow, text="", width=15, pady=8, relief="solid", padx=3)
+        self.lbl3 = tk.Label(self.LFWindow, text="", width=7, pady=8, relief="solid", padx=3)
         self.lbl3.grid(row=6, column=2)
 
         self.stop = False
@@ -90,7 +85,7 @@ class LeaderFollowerMissionClient(Thread):
 
         # Mission parameters
         self.stage = 0
-        self.grasping_time = 6.774 # seg
+        self.grasping_time = 13.5 # 6.774 # seg
         self.error_range1 = [i * 0.01 for i in self.ref_r1]
         self.error_range2 = [i * 0.01 for i in self.ref_r2]
         self.error2_range1 = [i * 0.01 for i in self.ref2_r1]

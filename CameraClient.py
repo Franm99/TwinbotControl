@@ -9,7 +9,7 @@ import time
 
 class CameraClient(Thread):
 
-    def __init__(self, root, name, url):
+    def __init__(self, root, geometryString, name, url):
         Thread.__init__(self)
         self.root = root
         self.name = name
@@ -17,6 +17,9 @@ class CameraClient(Thread):
         self.cameraWindow = tk.Toplevel(root)
         self.label = tk.Label(self.cameraWindow, text=url)
         self.label.grid(row=0, column=0, columnspan=3)
+
+        self.cameraWindow.title(name)
+        self.cameraWindow.geometry(geometryString)
 
         self.urlOperation = url + 'cameracolor.jpg'
         self.mirror = False
@@ -51,11 +54,13 @@ class CameraClient(Thread):
         self.buttonMirrorImg = tk.Button(self.cameraWindow, text="Mirror",command=self.mirrorImg)
         self.buttonMirrorImg.grid(row=5, rowspan=1, column=1, columnspan=2, sticky="nswe")
 
-        self.cameraWindow.title(name)
+        # self.buttonShowMarkers = tk.Button(self.cameraWindow, text="Markers")
+        # self.buttonShowMarkers.grid(row=6, rowspan=1, column=1, columnspan=2, sticky="nswe")
+
         self.width = 315
         self.height = 235
         self.canvas = tk.Canvas(self.cameraWindow, width=self.width, height=self.height)
-        self.canvas.grid(row=1, rowspan=5, column=0, columnspan=1, sticky="nswe")
+        self.canvas.grid(row=1, rowspan=6, column=0, columnspan=1, sticky="nswe")
 
     def getImage(self):
 

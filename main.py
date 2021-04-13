@@ -3,6 +3,7 @@ from CameraClient import CameraClient
 from TwinbotClient import TwinbotClient
 from LeaderFollowerClient import LeaderFollowerClient
 from LeaderFollowerMissionClient import LeaderFollowerMissionClient
+from VisionLeaderFollowerMissionClient import VisionLeaderFollowerMissionClient
 
 
 def execute_version(root, v=1):
@@ -16,10 +17,8 @@ def execute_version(root, v=1):
 
     # # Ex2: External Cameras (2 cameras) Feedback # #
         if v >= 2:
-            c1 = CameraClient(root, "Girona5001 Camera", "http://127.0.0.1:8001")
-            c1.cameraWindow.geometry("+10+100")
-            c2 = CameraClient(root, "Girona5002 Camera", "http://127.0.0.1:8011")
-            c2.cameraWindow.geometry("+10+400")
+            c1 = CameraClient(root, "+10+100", "Girona5001 Camera", "http://127.0.0.1:8001")
+            c2 = CameraClient(root, "+10+400", "Girona5002 Camera", "http://127.0.0.1:8011")
             c1.isImageColor = True
             c1.isImageColor = False
             c1.imageScalePercentage = 50
@@ -41,8 +40,14 @@ def execute_version(root, v=1):
                     lf.start()
 
                     if v >= 5:
-                        lfm = LeaderFollowerMissionClient(root, "294x260+722+400", "LF Mission", r1, r2)
+                        lfm = LeaderFollowerMissionClient(root, "190x260+722+400", "LF Mission", r1, r2)
                         lfm.start()
+    # # Ex5: Mission Plan and Vision-based leader follower
+                        if v >= 6:
+                            brov = TwinbotClient(root, "294x260+1025+100", "BlueROV Control", "http://127.0.0.1:8020")
+                            vlfm = VisionLeaderFollowerMissionClient(root, "+920+400", "Vision LF Mission",
+                                                                     "http://127.0.0.1:8021", brov)
+                            vlfm.start()
 
     print(f"TWINBOT Control Interface (v.{v})")
     root.mainloop()
@@ -50,4 +55,4 @@ def execute_version(root, v=1):
 
 if __name__ == "__main__":
     mainroot = tk.Tk()
-    execute_version(mainroot, 5)
+    execute_version(mainroot, 6)

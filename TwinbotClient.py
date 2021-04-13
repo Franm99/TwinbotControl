@@ -1,5 +1,7 @@
 import tkinter as tk
 import requests
+from threading import Lock
+
 
 class TwinbotClient():
 
@@ -19,6 +21,8 @@ class TwinbotClient():
             "close": '/CLOSE',
             "stopg": '/STOP'
             }
+
+    lock = Lock()
 
 
     def __init__(self, root, geometryString, name, url):
@@ -126,35 +130,45 @@ class TwinbotClient():
         ### ----------------- ###
 
     def forward(self):
-        r = requests.get(self.url + self.comm["fw"])
+        self.request_get(self.url, self.comm["fw"])
+        # r = requests.get(self.url + self.comm["fw"])
 
     def backward(self):
-        requests.get(self.url + self.comm["bw"])
+        self.request_get(self.url, self.comm["bw"])
+        # requests.get(self.url + self.comm["bw"])
 
     def left(self):
-        requests.get(self.url + self.comm["l"])
+        self.request_get(self.url, self.comm["l"])
+        # requests.get(self.url + self.comm["l"])
 
     def right(self):
-        requests.get(self.url + self.comm["r"])
+        self.request_get(self.url, self.comm["r"])
+        # requests.get(self.url + self.comm["r"])
 
     def up(self):
-        requests.get(self.url + self.comm["u"])
+        self.request_get(self.url, self.comm["u"])
+        # requests.get(self.url + self.comm["u"])
 
     def down(self):
-        requests.get(self.url + self.comm["d"])
+        self.request_get(self.url, self.comm["d"])
+        # requests.get(self.url + self.comm["d"])
 
     def turnleft(self):
-        requests.get(self.url + self.comm["tl"])
+        self.request_get(self.url, self.comm["tl"])
+        # requests.get(self.url + self.comm["tl"])
 
     def turnright(self):
-        requests.get(self.url + self.comm["tr"])
+        self.request_get(self.url, self.comm["tr"])
+        # requests.get(self.url + self.comm["tr"])
 
     def stop(self):
-        requests.get(self.url + self.comm["stop"])
+        self.request_get(self.url, self.comm["stop"])
+        # requests.get(self.url + self.comm["stop"])
 
     def setVelocityPctg(self, val):
         vel_values = "X=0&Y=0&Z=0,1&AZ=0&PERCENTAGE=" + val
-        requests.get(self.url + self.comm["vel"] + vel_values)
+        self.request_get(self.url, self.comm["vel"], vel_values)
+        # requests.get(self.url + self.comm["vel"] + vel_values)
         # http://localhost:8000/setVelocity?X=0,1&Y=0&Z=0&AZ=0&PERCENTAGE=100
 
     def setVelocity(self, x_vel, y_vel, z_vel, za_vel, vel_pctg):
@@ -165,10 +179,12 @@ class TwinbotClient():
         z_vel  = str(z_vel).replace(".", ",")
         za_vel = str(za_vel).replace(".", ",")
         vel_values = "X="+y_vel+"&Y="+x_vel+"&Z="+z_vel+"&AZ="+za_vel+"&PERCENTAGE="+str(vel_pctg)
-        requests.get(self.url + self.comm["vel"] + vel_values)
+        self.request_get(self.url, self.comm["vel"], vel_values)
+        # requests.get(self.url + self.comm["vel"] + vel_values)
 
     def getPosition(self):
-        req = requests.get(self.url + self.comm["pos"])
+        req = self.request_get(self.url, self.comm["pos"])
+        # req = requests.get(self.url + self.comm["pos"])
         pos_json = req.json()
         self.labelPosX['text'] = "x = " + str(round(pos_json["x"], 6))
         self.labelPosY['text'] = "y = " + str(round(pos_json["y"], 6))
@@ -178,10 +194,21 @@ class TwinbotClient():
         return self.pos
 
     def openG(self):
-        req = requests.get(self.url_gripper + self.comm["open"])
+        self.request_get(self.url_gripper, self.comm["open"])
+        # req = requests.get(self.url_gripper + self.comm["open"])
 
     def closeG(self):
-        req = requests.get(self.url_gripper + self.comm["close"])
+        self.request_get(self.url_gripper, self.comm["close"])
+        # req = requests.get(self.url_gripper + self.comm["close"])
 
     def stopG(self):
-        req = requests.get(self.url_gripper + self.comm["stopg"])
+        self.request_get(self.url_gripper, self.comm["stopg"])
+        # req = requests.get(self.url_gripper + self.comm["stopg"])
+
+    # Implement thread Locking to avoid errors
+    def request_get(self, url, comm, queue=""):
+        TwinbotClient.lock.acquire()
+        r = requests.get(url + comm + queue)
+        TwinbotClient.lock.release()
+        return r
+
